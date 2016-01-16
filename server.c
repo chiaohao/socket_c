@@ -72,6 +72,9 @@ void* thread_go(void* psocket){
 			bzero(tempt2, 25);
 			for(n=numbersit+1;n<strlen(buffert);n++)
 				tempt2[n-numbersit-1] = buffert[n];
+			for(n=0;n<25;n++)
+				if(tempt2[n]=='\0')
+					tempt2[n] = ' ';
 			FILE *fp;
 			fp = fopen("register.txt", "r");
 			if(fp==NULL)
@@ -198,16 +201,38 @@ void* thread_go(void* psocket){
 				from->u.balance -= payment;
 				to->u.balance += payment;
 			//change the file balance
-/*				FILE *fp;
+				FILE *fp;
 				int pos = 0;
-				fp = fopen("register.txt", r+);
+				fp = fopen("register.txt", "r+");
 				while(fgets(buffert, 1024, fp)){
 					pos += strlen(buffert);
+					char bal[25];
 					if(strncmp(buffert, from->u.name, strlen(from->u.name))==0){
-						//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+						bzero(bal, 25);
+						sprintf(bal, "%d", from->u.balance);
+						for(n=0;n<25;n++)
+							if(bal[n]=='\0')
+								bal[n] = ' ';
+						int fpt = fseek(fp, pos, SEEK_SET);
+						if(fpt<0)
+							error("fseek");
+						fprintf(fp, "%s", bal);
+						pos += 25;
+					}
+					else if(strncmp(buffert, to->u.name, strlen(to->u.name))==0){
+						bzero(bal, 25);
+						sprintf(bal, "%d", to->u.balance);
+						for(n=0;n<25;n++)
+							if(bal[n]=='\0')
+								bal[n] = ' ';
+						int fpt = fseek(fp, pos, SEEK_SET);
+						if(fpt<0)
+							error("fseek");
+						fprintf(fp, "%s", bal);
+						pos += 25;
 					}
 				}
-*/			//send a msg for success
+			//send a msg for success
 				bzero(buffert, 1024);
 				strcpy(buffert, "SUCCESS PAYMENT\n");
 			}
@@ -227,7 +252,6 @@ void* thread_go(void* psocket){
 			}
 			struct list *cur = head_list;
 			while(cur!=NULL){
-				printf("%s, %s\n",tempt, cur->u.name);
 				if(strncmp(tempt, cur->u.name, strlen(tempt))==0)
 					is_double_loginned = true;
 				cur = cur->next;
